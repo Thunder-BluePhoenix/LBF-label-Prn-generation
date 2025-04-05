@@ -4,4 +4,4 @@ generation of prn for labels
 
 #### License
 
-mit
+mit# LBF-label-Prn-generation

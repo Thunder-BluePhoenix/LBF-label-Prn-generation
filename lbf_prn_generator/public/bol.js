@@ -15,18 +15,21 @@ frappe.ui.form.on("Bill Of Landing", {
       frm.add_custom_button(
         __("Download PRN File"),
         function () {
-          const args = {
-            doctype: frm.doctype,
-            docname: frm.docname,
-            service_type: "Peneus Hub",
-          };
-          const url = frappe.urllib.get_full_url(
-            `/api/method/lbf_logistica.lbf_logistica.doctype.bill_of_landing.bill_of_landing.generate_json_labels?` +
-              `doctype=${encodeURIComponent(args.doctype)}&` +
-              `docname=${encodeURIComponent(args.docname)}&` +
-              `service_type=${encodeURIComponent(args.service_type)}`,
-          );
-          window.open(url);
+
+          open_prn_generation_dialog(frm, (label = "pneushub_inbound"));
+          // const args = {
+          //   doctype: frm.doctype,
+          //   docname: frm.docname,
+          //   service_type: "Peneus Hub",
+          // };
+          // const url = frappe.urllib.get_full_url(
+          //   `/api/method/lbf_logistica.lbf_logistica.doctype.bill_of_landing.bill_of_landing.generate_json_labels?` +
+          //     `doctype=${encodeURIComponent(args.doctype)}&` +
+          //     `docname=${encodeURIComponent(args.docname)}&` +
+          //     `service_type=${encodeURIComponent(args.service_type)}`,
+          // );
+          // window.open(url);
+
         },
         __("Generate Files"),
       );
@@ -41,7 +44,9 @@ frappe.ui.form.on("Bill Of Landing", {
       frm.add_custom_button(
         __("Download PRN File"),
         function () {
-          open_json_generation_dialog(frm);
+
+          open_prn_generation_dialog(frm, (label = "tyrehotel"));
+
         },
         __("Generate Files"),
       );
@@ -49,7 +54,9 @@ frappe.ui.form.on("Bill Of Landing", {
   },
 });
 
-function open_json_generation_dialog(frm) {
+
+function open_prn_generation_dialog(frm, label) {
+
   let service = frm.doc.service;
 
   let dialog = new frappe.ui.Dialog({
@@ -69,6 +76,7 @@ function open_json_generation_dialog(frm) {
         fieldtype: "Check",
         default: 0,
       },
+
       {
         fieldname: "skip_custom_printers",
         label: "Custom Printers",
@@ -77,14 +85,21 @@ function open_json_generation_dialog(frm) {
         onchange: function () {
           const skipCustomPrinters = this.get_value();
 
+          const labelType = dialog.get_value("label_type");
+
+          const shouldShowCustomerPrinter =
+            skipCustomPrinters && labelType === "Tyre Hotel";
+
+
           dialog.set_df_property(
             "customer_has_own_printer",
             "hidden",
-            !skipCustomPrinters,
+
+            !shouldShowCustomerPrinter,
           );
 
-          // If unchecked, also uncheck 'customer_has_own_printer'
-          if (!skipCustomPrinters) {
+          if (!shouldShowCustomerPrinter) {
+
             dialog.set_value("customer_has_own_printer", 0);
           }
 
@@ -99,7 +114,9 @@ function open_json_generation_dialog(frm) {
         hidden: 1,
       },
     ],
-    primary_action_label: __("Download JSON"),
+
+    primary_action_label: __("Download PRN"),
+
     primary_action: function (data) {
       if (typeof data.customer_has_own_printer === "undefined") {
         data.customer_has_own_printer = 0;
@@ -107,13 +124,15 @@ function open_json_generation_dialog(frm) {
       const args = {
         doctype: frm.doctype,
         docname: frm.docname,
-        service_type: "Tyre Hotel",
-        label_type: data.label_type,
+
+        service_type: service,
+        label_type: label,
+
         custom_header: data.custom_header,
         skip_custom_printers: data.skip_custom_printers,
         customer_has_own_printer: data.customer_has_own_printer,
       };
-      console.log(data);
+
       const url = frappe.urllib.get_full_url(
         `/api/method/lbf_prn_generator.method.json_creator.generate_json_labels?` +
           `doctype=${encodeURIComponent(args.doctype)}&` +
@@ -132,6 +151,18 @@ function open_json_generation_dialog(frm) {
   });
 
   dialog.show();
+
+  const initialSkipCustomPrinters = dialog.get_value("skip_custom_printers");
+  const initialLabelType = dialog.get_value("label_type");
+  const showCustomerPrinter =
+    initialSkipCustomPrinters && initialLabelType === "Tyre Hotel";
+
+  dialog.set_df_property(
+    "customer_has_own_printer",
+    "hidden",
+    !showCustomerPrinter,
+  );
+
 
   // Generate and insert the HTML table with pre-checked serials
   let table_html = `

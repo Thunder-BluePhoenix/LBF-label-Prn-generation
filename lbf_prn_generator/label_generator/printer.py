@@ -200,6 +200,7 @@ class LabelPrinter:
 
         prn_buffer = io.BytesIO()
 
+
         with open(self.output_path, 'wb') as f:
             for label in json_data:
                 validate_label(label, label_type)
@@ -213,9 +214,12 @@ class LabelPrinter:
 
         return prn_buffer.getvalue()
 
+
 def generate_label_file_from_json(json_input_str, label_type=None, custom_header=False, output_path=None):
     payload = json.loads(json_input_str)
     label_type, labels, custom_header, skip_custom_printers = validate_payload(payload)
 
     printer = LabelPrinter(output_path=output_path)
+
     return printer.print_labels(label_type=label_type, json_data=labels, custom_header=custom_header)
+

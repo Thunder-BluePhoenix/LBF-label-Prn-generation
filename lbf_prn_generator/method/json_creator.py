@@ -103,8 +103,11 @@ def generate_label_json(doc, items, service_type="Peneus Hub", label_type=None, 
                             "code": (serial_doc.custom_customer_code or "").upper()
                         },
                         "product": {
+                            "id": serial_doc.name,
                             "slug": custom_slug,
-                            "code": item.get('item_code') or ""
+                            "code": item.get('item_code') or "None",
+                            "description": item.item_name,
+                            "sku": serial_doc.custom_upc or "None"
                         },
                         "packaging": {
                             "index": index,
@@ -170,8 +173,11 @@ def download_label_json(doc, items=None, service_type="Peneus Hub", label_type=N
 
     json_str = json.dumps(label_data, indent=2)
 
-    prn = generate_label_file_from_json_payload(json_str,output_path="./my_output_file.prn")
-    print("Hello",prn)
+    prn = generate_label_file_from_json_payload(json_str)
+
+    frappe.local.response.filename = f"labels_{doc.name}.prn"
+    frappe.local.response.filecontent = prn
+    frappe.local.response.type = "binary"
 
     # Prepare the file for download
     # filename = f"labels_{doc.name}_{generate_random_string()}.json"
@@ -196,17 +202,13 @@ def generate_json_labels(doctype, docname, service_type="Peneus Hub", label_type
     Returns:
         Response: HTTP response with JSON file download
     """
-    print("@@@@@@@@@@","func called")
     try:
         doc = frappe.get_doc(doctype, docname)
-        print("@@@@@@@@@@",doc)
 
         if service_type == "Peneus Hub":
             items = doc.get("item_details_ph")
         else:
             items = doc.get("item_details_th")
-
-        print("@@@@@@@@@@",items)
 
         if not items:
             frappe.throw(f"No items found for {service_type}")

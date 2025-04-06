@@ -4,6 +4,7 @@ from datetime import datetime
 import json
 import string
 import random
+import io
 from .config import HEADER_FILES, BODY_FILE, DEFAULT_OUTPUT_DIR
 
 def keygen_rand(size=16, chars=string.ascii_uppercase + string.digits):
@@ -197,7 +198,7 @@ class LabelPrinter:
 
         mapping = LABEL_FIELD_MAP[label_type]["mapping"]
 
-        print("Bello",mapping)
+        prn_buffer = io.BytesIO()
 
         with open(self.output_path, 'wb') as f:
             for label in json_data:
@@ -207,14 +208,14 @@ class LabelPrinter:
                 except Exception as e:
                     raise ValueError(f"Error formatting label fields: {e}")
                 rendered_body = body.format(**data)
-                f.write(header + rendered_body.encode('utf-8'))
+                prn_buffer.write(header + rendered_body.encode('UTF-8'))
+                # f.write(header + rendered_body.encode('utf-8'))
 
-        return self.output_path
+        return prn_buffer.getvalue()
 
 def generate_label_file_from_json(json_input_str, label_type=None, custom_header=False, output_path=None):
     payload = json.loads(json_input_str)
     label_type, labels, custom_header, skip_custom_printers = validate_payload(payload)
 
     printer = LabelPrinter(output_path=output_path)
-    prn = printer.print_labels(label_type=label_type, json_data=labels, custom_header=custom_header)
-    return prn
+    return printer.print_labels(label_type=label_type, json_data=labels, custom_header=custom_header)

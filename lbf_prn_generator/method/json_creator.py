@@ -39,11 +39,13 @@ def generate_label_json(doc, items, service_type="Peneus Hub", label_type=None, 
 
     if service_type == "Tyre Hotel":
     # Initialize the result structure
+        customer = frappe.get_doc("Customer", doc.customer)
+        has_own_printer = customer.custom_has_own_printer
         result = {
             "label_type": "tyrehotel",
             "custom_header": False if custom_header == "0" else True,
             "skip_custom_printers": False if skip_custom_printers == "0" else True,
-            "customer_has_own_printer": False if customer_has_own_printer == "0" else True,
+            "customer_has_own_printer": False if has_own_printer == "0" else True,
             "document_info": {
                 "doctype": doc.doctype,
                 "docname": doc.name,

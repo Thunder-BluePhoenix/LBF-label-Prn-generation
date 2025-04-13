@@ -1,4 +1,4 @@
-frappe.ui.form.on("Bill Of Landing", {
+frappe.ui.form.on("Pick List", {
   refresh: function (frm) {
     // Add button for Peneus Hub labels
     // Add this to the end of the refresh function in bill_of_landing.js to replace the existing button handlers
@@ -8,29 +8,13 @@ frappe.ui.form.on("Bill Of Landing", {
     //   frm.remove_custom_button("Download JSON Labels", "Generate Files");
     // }, 500);
     if (
-      frm.doc.service === "Peneus Hub" &&
-      frm.doc.item_details_ph &&
-      frm.doc.item_details_ph.length > 0
+      frm.doc.custom_service === "Peneus Hub" &&
+      frm.doc.custom_p_purpose === "Redelivery" &&
+      frm.doc.custom_pl_status === "Completed"
     ) {
-      frm.add_custom_button(
-        __("Download PRN File"),
-        function () {
-          open_prn_generation_dialog(frm, (label = "pneushub_inbound"));
-          // const args = {
-          //   doctype: frm.doctype,
-          //   docname: frm.docname,
-          //   service_type: "Peneus Hub",
-          // };
-          // const url = frappe.urllib.get_full_url(
-          //   `/api/method/lbf_logistica.lbf_logistica.doctype.bill_of_landing.bill_of_landing.generate_json_labels?` +
-          //     `doctype=${encodeURIComponent(args.doctype)}&` +
-          //     `docname=${encodeURIComponent(args.docname)}&` +
-          //     `service_type=${encodeURIComponent(args.service_type)}`,
-          // );
-          // window.open(url);
-        },
-        __("Generate Files"),
-      );
+      frm.add_custom_button(__("Download PRN File"), function () {
+        open_prn_generation_dialog(frm, (label = "pneushub_outbound"));
+      });
     }
 
     // Add button for Tyre Hotel labels
@@ -61,7 +45,7 @@ frappe.ui.form.on("Bill Of Landing", {
 });
 
 function open_prn_generation_dialog(frm, label) {
-  let service = frm.doc.service;
+  let service = frm.doc.custom_service;
 
   let dialog = new frappe.ui.Dialog({
     title: "PRN Generation",
@@ -88,71 +72,43 @@ function open_prn_generation_dialog(frm, label) {
         default: 0,
         onchange: function () {
           const skipCustomPrinters = this.get_value();
-
           const labelType = dialog.get_value("label_type");
-
-          const shouldShowCustomerPrinter =
-            skipCustomPrinters && labelType === "Tyre Hotel";
-
-          // dialog.set_df_property(
-          //   "customer_has_own_printer",
-          //   "hidden",
-
-          //   !shouldShowCustomerPrinter,
-          // );
-
-          // if (!shouldShowCustomerPrinter) {
-
-          //   dialog.set_value("customer_has_own_printer", 0);
-          // }
-
           dialog.refresh();
         },
       },
-      // {
-      //   fieldname: "customer_has_own_printer",
-      //   label: "Customer Has Own Printer",
-      //   fieldtype: "Check",
-      //   default: 0,
-      //   hidden: 1,
-      // },
     ],
 
     primary_action_label: __("Download PRN"),
 
     primary_action: function (data) {
-      // if (typeof data.customer_has_own_printer === "undefined") {
-      //   data.customer_has_own_printer = 0;
-      // }
       const args = {
         doctype: frm.doctype,
         docname: frm.docname,
-
         service_type: service,
         label_type: label,
-
         custom_header: data.custom_header,
         skip_custom_printers: data.skip_custom_printers,
-        // customer_has_own_printer: data.customer_has_own_printer,
+        submission_date: data.custom_submission_date,
       };
-      console.log(typeof frm.doc.docstatus);
 
       const url = frappe.urllib.get_full_url(
-        frm.doc.docstatus === 0
-          ? `/api/method/lbf_prn_generator.method.customer_prn.generate_json_labels_customer?` +
+        frm.doc.docstatus === 1
+          ? `/api/method/lbf_prn_generator.method.generate_prn_pl.generate_json_labels_PL?` +
               `doctype=${encodeURIComponent(args.doctype)}&` +
               `docname=${encodeURIComponent(args.docname)}&` +
               `service_type=${encodeURIComponent(args.service_type)}&` +
               `label_type=${encodeURIComponent(args.label_type)}&` +
               `custom_header=${encodeURIComponent(args.custom_header)}&` +
-              `skip_custom_printers=${encodeURIComponent(args.skip_custom_printers)}`
+              `skip_custom_printers=${encodeURIComponent(args.skip_custom_printers)}&` +
+              `submission_date=${encodeURIComponent(args.submission_date)}&`
           : `/api/method/lbf_prn_generator.method.json_creator.generate_json_labels?` +
               `doctype=${encodeURIComponent(args.doctype)}&` +
               `docname=${encodeURIComponent(args.docname)}&` +
               `service_type=${encodeURIComponent(args.service_type)}&` +
               `label_type=${encodeURIComponent(args.label_type)}&` +
               `custom_header=${encodeURIComponent(args.custom_header)}&` +
-              `skip_custom_printers=${encodeURIComponent(args.skip_custom_printers)}`,
+              `skip_custom_printers=${encodeURIComponent(args.skip_custom_printers)}&` +
+              `submission_date=${encodeURIComponent(args.submission_date)}`,
       );
 
       window.open(url);

@@ -24,7 +24,7 @@ def remove_accents(text):
     return text
 
 
-def generate_label_json(doc, items, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
+def generate_label_json_customer(doc, items, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
     """
     Generate label data in JSON format
 
@@ -73,7 +73,7 @@ def generate_label_json(doc, items, service_type="Peneus Hub", label_type=None, 
     # Process each item
     for item in items:
         # Get accepted and rejected bundles
-        accepted_bundles = (item.get('serial_and_batch_bundle_accepted') or '').split(',')
+        accepted_bundles = (item.get('customer_batch_bundle') or '').split(',')
 
         # Process each accepted bundle
         for bundle_name in accepted_bundles:
@@ -105,7 +105,6 @@ def generate_label_json(doc, items, service_type="Peneus Hub", label_type=None, 
                             "code": (serial_doc.custom_customer_code or "").upper()
                         },
                         "product": {
-
                             "id": serial_doc.name,
                             "slug": custom_slug,
                             "code": item.get('item_code') or "None",
@@ -148,10 +147,11 @@ def generate_label_json(doc, items, service_type="Peneus Hub", label_type=None, 
 
                 # Add label data to result
                 result["labels"].append(label_data)
+
     return result
 
 
-def download_label_json(doc, items=None, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
+def download_label_json_customer(doc, items=None, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
     """
     Generate and download a label file in JSON format
 
@@ -170,7 +170,7 @@ def download_label_json(doc, items=None, service_type="Peneus Hub", label_type=N
             items = doc.item_details_th
 
     # Generate the label data
-    label_data = generate_label_json(doc, items, service_type, label_type, custom_header, skip_custom_printers,customer_has_own_printer)
+    label_data = generate_label_json_customer(doc, items, service_type, label_type, custom_header, skip_custom_printers,customer_has_own_printer)
     # Convert to JSON string
     # import json
 
@@ -195,7 +195,7 @@ def download_label_json(doc, items=None, service_type="Peneus Hub", label_type=N
 
 
 @frappe.whitelist()
-def generate_json_labels(doctype, docname, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
+def generate_json_labels_customer(doctype, docname, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
     """
     Generate and download JSON label data for a Bill of Landing document
 
@@ -221,7 +221,7 @@ def generate_json_labels(doctype, docname, service_type="Peneus Hub", label_type
         if not items:
             frappe.throw(f"No items found for {service_type}")
 
-        return download_label_json(doc, items, service_type, label_type, custom_header, skip_custom_printers,customer_has_own_printer)
+        return download_label_json_customer(doc, items, service_type, label_type, custom_header, skip_custom_printers,customer_has_own_printer)
 
     except Exception as e:
         frappe.log_error(title="JSON Label Generation Error", message=frappe.get_traceback())

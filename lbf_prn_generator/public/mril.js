@@ -6,6 +6,27 @@ frappe.ui.form.on("Material Request Instruction Log", {
       frm.doc.th_items &&
       frm.doc.th_items.length > 0
     ) {
+      if (frm.doc.labels_ready_for_print == 1) {
+        frm.add_custom_button(__("Print Labels"), function () {
+          frappe.model.with_doctype(frm.doc.doctype, function () {
+            var w = window.open(
+              frappe.urllib.get_full_url(
+                "/printview?doctype=" +
+                  encodeURIComponent(frm.doc.doctype) +
+                  "&name=" +
+                  encodeURIComponent(frm.doc.name) +
+                  "&trigger_print=1" +
+                  "&format=" +
+                  encodeURIComponent("Customer PF") +
+                  "&no_letterhead=0",
+              ),
+            );
+            if (!w) {
+              frappe.msgprint(__("Please enable pop-ups"));
+            }
+          });
+        });
+      }
       if (
         frm.doc.docstatus === 1 &&
         frm.doc.labels_ready_for_print === 1 &&

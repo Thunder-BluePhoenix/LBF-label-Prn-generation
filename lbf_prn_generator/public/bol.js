@@ -1,14 +1,14 @@
 frappe.ui.form.on("Bill Of Landing", {
   refresh: function (frm) {
-    // Add button for Peneus Hub labels
+    // Add button for Pneus Hub labels
     // Add this to the end of the refresh function in bill_of_landing.js to replace the existing button handlers
 
-    // Add button for Peneus Hub labels
+    // Add button for Pneus Hub labels
     // setTimeout(function () {
     //   frm.remove_custom_button("Download JSON Labels", "Generate Files");
     // }, 500);
     if (
-      frm.doc.service === "Peneus Hub" &&
+      frm.doc.service === "Pneus Hub" &&
       frm.doc.item_details_ph &&
       frm.doc.item_details_ph.length > 0
     ) {
@@ -19,7 +19,7 @@ frappe.ui.form.on("Bill Of Landing", {
           // const args = {
           //   doctype: frm.doctype,
           //   docname: frm.docname,
-          //   service_type: "Peneus Hub",
+          //   service_type: "Pneus Hub",
           // };
           // const url = frappe.urllib.get_full_url(
           //   `/api/method/lbf_logistica.lbf_logistica.doctype.bill_of_landing.bill_of_landing.generate_json_labels?` +

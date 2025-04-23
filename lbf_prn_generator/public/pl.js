@@ -1,14 +1,14 @@
 frappe.ui.form.on("Pick List", {
   refresh: function (frm) {
-    // Add button for Peneus Hub labels
+    // Add button for Pneus Hub labels
     // Add this to the end of the refresh function in bill_of_landing.js to replace the existing button handlers
 
-    // Add button for Peneus Hub labels
+    // Add button for Pneus Hub labels
     // setTimeout(function () {
     //   frm.remove_custom_button("Download JSON Labels", "Generate Files");
     // }, 500);
     if (
-      frm.doc.custom_service === "Peneus Hub" &&
+      frm.doc.custom_service === "Pneus Hub" &&
       frm.doc.custom_p_purpose === "Redelivery" &&
       frm.doc.custom_pl_status === "Completed"
     ) {

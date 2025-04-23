@@ -24,14 +24,14 @@ def remove_accents(text):
     return text
 
 
-def generate_label_json_MRIL(doc, items, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False):
+def generate_label_json_MRIL(doc, items, service_type="Pneus Hub", label_type=None, custom_header=False, skip_custom_printers=False):
     """
     Generate label data in JSON format
 
     Args:
         doc: Frappe document object
         items: List of items to generate labels for
-        service_type: Service type ('Peneus Hub' or 'Tyre Hotel')
+        service_type: Service type ('Pneus Hub' or 'Tyre Hotel')
 
     Returns:
         dict: JSON-ready dictionary with all label data
@@ -91,7 +91,7 @@ def generate_label_json_MRIL(doc, items, service_type="Peneus Hub", label_type=N
                 serial_doc = frappe.get_doc('Serial No', entry.serial_no.strip())
 
                 # Prepare label data
-                if service_type == "Peneus Hub":
+                if service_type == "Pneus Hub":
                     custom_slug = (serial_doc.custom_slug or '').upper()
 
                     label_data = {
@@ -150,20 +150,20 @@ def generate_label_json_MRIL(doc, items, service_type="Peneus Hub", label_type=N
     return result
 
 
-def download_label_json_MRIL(doc, items=None, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False):
+def download_label_json_MRIL(doc, items=None, service_type="Pneus Hub", label_type=None, custom_header=False, skip_custom_printers=False):
     """
     Generate and download a label file in JSON format
 
     Args:
         doc: Frappe document object
         items: List of items to print labels for (optional)
-        service_type: Service type ('Peneus Hub' or 'Tyre Hotel')
+        service_type: Service type ('Pneus Hub' or 'Tyre Hotel')
 
     Returns:
         Response: HTTP response with JSON file download
     """
     if items is None:
-        if service_type == "Peneus Hub":
+        if service_type == "Pneus Hub":
             items = doc.item_details_ph
         else:  # Tyre Hotel
             items = doc.item_details_th
@@ -194,14 +194,14 @@ def download_label_json_MRIL(doc, items=None, service_type="Peneus Hub", label_t
 
 
 @frappe.whitelist()
-def generate_json_labels_MRIL(doctype, docname, service_type="Peneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
+def generate_json_labels_MRIL(doctype, docname, service_type="Pneus Hub", label_type=None, custom_header=False, skip_custom_printers=False,customer_has_own_printer=False):
     """
     Generate and download JSON label data for a Bill of Landing document
 
     Args:
         doctype: Document type
         docname: Document name
-        service_type: Service type ('Peneus Hub' or 'Tyre Hotel')
+        service_type: Service type ('Pneus Hub' or 'Tyre Hotel')
 
     Returns:
         Response: HTTP response with JSON file download
@@ -211,7 +211,7 @@ def generate_json_labels_MRIL(doctype, docname, service_type="Peneus Hub", label
         doc = frappe.get_doc(doctype, docname)
 
         items = doc.get("th_items")
-        # if service_type == "Peneus Hub":
+        # if service_type == "Pneus Hub":
         #     items = doc.get("th_items")
         # else:
 

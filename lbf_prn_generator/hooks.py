@@ -44,9 +44,9 @@ app_license = "mit"
 
 # include js in doctype views
 doctype_js = {
-    "Bill Of Landing" : "public/bol.js",
-    "Material Request Instruction Log" : "public/mril.js",
-    "Pick List" : "public/pl.js"
+    "Bill Of Landing" : "public/js/bol.js",
+    "Material Request Instruction Log" : "public/js/mril.js",
+    "Pick List" : "public/js/pl.js"
 }
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
